@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DevOps Study Todo List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">DevOps Study Todo List</h1>
+
+        <a href="{{ url_for('add_tool') }}" class="btn btn-primary mb-3">Add New Tool</a>
+
+        <div class="list-group">
+            {% for tool in tools %}
+            <div class="list-group-item mb-3">
+                <div class="d-flex justify-content-between">
+                    <h4>{{ tool.tool_name }}</h4>
+                    <span class="badge badge-{{ 'success' if tool.status == 'completed' else 'warning' if tool.status == 'revision' else 'danger' }}">
+                        {{ tool.status|capitalize }}
+                    </span>
+                </div>
+                
+                {% if tool.status in ['pending', 'revision'] %}
+                <div class="progress mb-2">
+                    <div class="progress-bar" role="progressbar" style="width: {{ tool.completion_percent }}%;">
+                        {{ tool.completion_percent }}%
+                    </div>
+                </div>
+                
+                <h6>Pending Topics:</h6>
+                <ul>
+                    {% for topic in tool.pending_topics %}
+                    <li>{{ topic.topic }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                
+                <form method="POST" action="{{ url_for('update_status', tool_id=tool.id) }}" class="mt-2">
+                    <div class="form-group">
+                        <select name="status" class="form-control">
+                            <option value="pending" {% if tool.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="completed" {% if tool.status == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="revision" {% if tool.status == 'revision' %}selected{% endif %}>Revision</option>
+                        </select>
+                    </div>
+                    
+                    <div id="completion-container" style="display: {% if tool.status in ['pending', 'revision'] %}block{% else %}none{% endif %};">
+                        <div class="form-group">
+                            <label>Completion Percentage</label>
+                            <input type="number" name="completion_percent" class="form-control" 
+                                   value="{{ tool.completion_percent if tool.completion_percent else '' }}" min="0" max="100">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-sm btn-info">Update Status</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+    document.querySelectorAll('select[name="status"]').forEach(select => {
+        select.addEventListener('change', function() {
+            const completionContainer = this.closest('form').querySelector('#completion-container');
+            if (this.value === 'pending' || this.value === 'revision') {
+                completionContainer.style.display = 'block';
+            } else {
+                completionContainer.style.display = 'none';
+            }
+        });
+    });
+    </script>
+</body>
+</html>
