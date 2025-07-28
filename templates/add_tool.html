@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">Add New DevOps Tool</h1>
+
+<form method="POST">
+    <div class="form-group">
+        <label>Tool Name</label>
+        <input type="text" name="tool_name" class="form-control" required>
+    </div>
+    
+    <div class="form-group">
+        <label>Status</label>
+        <select name="status" class="form-control" id="status-select" required>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="revision">Revision</option>
+        </select>
+    </div>
+    
+    <div class="form-group" id="completion-group">
+        <label>Completion Percentage</label>
+        <input type="number" name="completion_percent" class="form-control" min="0" max="100">
+    </div>
+    
+    <div id="topics-container">
+        <label>Pending Topics</label>
+        <div class="input-group mb-2">
+            <input type="text" name="pending_topics" class="form-control">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="add-topic">+</button>
+            </div>
+        </div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Add Tool</button>
+</form>
+
+<script>
+const statusSelect = document.getElementById('status-select');
+const completionGroup = document.getElementById('completion-group');
+const topicsContainer = document.getElementById('topics-container');
+
+function toggleFields() {
+    if (statusSelect.value === 'pending' || statusSelect.value === 'revision') {
+        completionGroup.style.display = 'block';
+        topicsContainer.style.display = 'block';
+    } else {
+        completionGroup.style.display = 'none';
+        topicsContainer.style.display = 'none';
+    }
+}
+
+// Initial setup
+toggleFields();
+
+// Add event listener
+statusSelect.addEventListener('change', toggleFields);
+
+// Add more topic fields
+document.getElementById('add-topic').addEventListener('click', function() {
+    const newInput = document.createElement('div');
+    newInput.className = 'input-group mb-2';
+    newInput.innerHTML = `
+        <input type="text" name="pending_topics" class="form-control">
+        <div class="input-group-append">
+            <button class="btn btn-outline-danger" type="button" onclick="this.parentElement.parentElement.remove()">-</button>
+        </div>
+    `;
+    topicsContainer.appendChild(newInput);
+});
+</script>
+{% endblock %}

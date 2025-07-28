@@ -1,0 +1,15 @@
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+class DevOpsTool(db.Model):
+    __tablename__ = 'devops_tool'  # Explicit table name
+    id = db.Column(db.Integer, primary_key=True)
+    # ... other columns ...
+    pending_topics = db.relationship('PendingTopic', backref='devops_tool', lazy=True)
+
+class PendingTopic(db.Model):
+    __tablename__ = 'pending_topic'  # Explicit table name
+    id = db.Column(db.Integer, primary_key=True)
+    topic = db.Column(db.String(200), nullable=False)
+    tool_id = db.Column(db.Integer, db.ForeignKey('devops_tool.id'), nullable=False)
